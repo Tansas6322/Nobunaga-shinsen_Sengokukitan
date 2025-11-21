@@ -1,0 +1,352 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "メイリオ", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+header {
+  background: #222;
+  color: #fff;
+  padding: 12px 16px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.search-area {
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.search-area input {
+  margin-left: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.busho-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  padding: 12px 16px 40px;
+}
+
+.busho-card {
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  font-size: 14px;
+}
+
+.busho-name {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.busho-meta {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.busho-stats {
+  font-size: 12px;
+  color: #333;
+  line-height: 1.4;
+}
+
+.empty-message {
+  padding: 16px;
+  color: #666;
+}
+
+.busho-own {
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.search-row {
+  margin-bottom: 8px;
+}
+
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.filter-row select {
+  margin-left: 4px;
+  padding: 2px 6px;
+  font-size: 13px;
+}
+
+.filter-owned input {
+  margin-right: 4px;
+}
+
+.busho-card {
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+}
+
+.busho-card:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+
+.busho-card:active {
+  transform: scale(0.98);
+}
+
+.busho-card.owned {
+  background: #e7f6ff;
+  border: 1px solid #4aa3ff;
+}
+
+.busho-own-status {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #666;
+}
+
+.busho-card.owned .busho-own-status {
+  color: #0b63c5;
+}
+
+.export-area {
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.export-area h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.export-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.export-controls button {
+  padding: 4px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid #888;
+  background: #f4f4f4;
+  cursor: pointer;
+}
+
+.export-controls button:hover {
+  background: #e8e8e8;
+}
+
+#owned-text {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 12px;
+  font-family: Consolas, "Courier New", monospace;
+  padding: 6px 8px;
+  resize: vertical;
+}
+
+.tabs {
+  display: flex;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  background: #eee;
+}
+
+.tab-button.active {
+  background: #fff;
+  border-bottom: 2px solid #0078ff;
+  font-weight: bold;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ==== 戦法タブ用 ==== */
+
+#tactics-tab .tactics-search-area {
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+#tactics-tab .tactics-search-area input {
+  margin-left: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.tactic-card .tactics-owners,
+.tactic-card .tactics-effect {
+  font-size: 12px;
+  margin-top: 4px;
+  color: #333;
+}
+
+.tactic-card .tactics-effect {
+  color: #555;
+  line-height: 1.4;
+}
+
+.tactics-taishogi {
+  font-weight: bold;
+  color: #c0392b;
+}
+
+/* 種類ごとの色分け（左側に色付きライン） */
+.tactic-card.type-active {
+  border-left: 4px solid #3498db;
+}
+
+.tactic-card.type-command {
+  border-left: 4px solid #27ae60;
+}
+
+.tactic-card.type-charge {
+  border-left: 4px solid #e67e22;
+}
+
+.tactic-card.type-passive {
+  border-left: 4px solid #9b59b6;
+}
+
+.tactic-card.type-arms {
+  border-left: 4px solid #7f8c8d;
+}
+
+/* =========================================
+   スマホ向けレイアウト調整
+   ========================================= */
+@media (max-width: 768px) {
+  header {
+    padding: 10px 12px;
+  }
+
+  header h1 {
+    font-size: 16px;
+  }
+
+  header p {
+    font-size: 12px;
+  }
+
+  .search-area {
+    padding: 10px 12px;
+  }
+
+  .search-area input {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 6px 0 0;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .filter-row select {
+    margin-left: 0;
+    margin-top: 4px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .busho-list {
+    grid-template-columns: 1fr;       /* 1列表示に固定 */
+    padding: 8px 8px 24px;
+    gap: 8px;
+  }
+
+  .busho-card {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .busho-name {
+    font-size: 14px;
+  }
+
+  .export-area {
+    padding: 10px 12px;
+  }
+
+  #owned-text {
+    font-size: 11px;
+  }
+
+  /* タブをスマホっぽく */
+  .tabs {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    overflow-x: auto;
+  }
+
+  .tab-button {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+.share-area {
+  padding: 12px 16px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #ddd;
+  margin-top: 8px;
+}
+
+.share-area h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.share-hint {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: #555;
+}
+
+#share-link {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 12px;
+  padding: 4px 8px;
+}

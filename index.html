@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <!-- ★ この1行を追加 ★ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>信長の野望 真戦 編成サポート（武将一覧）</title>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+  <header>
+    <h1>信長の野望 真戦 編成サポート</h1>
+    <p>Step1: 武将一覧 + 検索</p>
+  </header>
+
+  <!-- ★ ここにタブナビを移動 ★ -->
+  <nav class="tabs">
+    <button class="tab-button active" data-tab="busho-tab">武将</button>
+    <button class="tab-button" data-tab="tactics-tab">戦法</button>
+  </nav>
+ <section class="search-area">
+  <div class="search-row">
+    <label>
+      武将名 / 勢力で検索：
+      <input type="text" id="search-input" placeholder="例） 信長, 織田 など">
+    </label>
+  </div>
+
+  <div class="filter-row">
+    <label>
+      星：
+      <select id="filter-star">
+        <option value="">すべて</option>
+        <!-- JS でユニークな星を追加します -->
+      </select>
+    </label>
+
+    <label>
+      勢力：
+      <select id="filter-faction">
+        <option value="">すべて</option>
+        <!-- JS でユニークな勢力を追加します -->
+      </select>
+    </label>
+
+    <label class="filter-owned">
+      <input type="checkbox" id="filter-owned">
+      所持している武将のみ表示
+    </label>
+  </div>
+</section>
+
+
+<main>
+
+  <!-- 武将タブ -->
+  <section id="busho-tab" class="tab-content active">
+    <!-- ここに武将のUI（今あるもの全部）を丸ごと入れる -->
+    <section class="export-area">
+      <h2>編成相談用：所持武将リスト</h2>
+      <div class="export-controls">
+        <button id="generate-owned-text">所持武将リストを生成</button>
+        <button id="copy-owned-text">コピー</button>
+      </div>
+      <textarea id="owned-text" rows="8" readonly></textarea>
+    </section>
+
+    <!-- ★ ここから共有リンクエリア ★ -->
+    <section class="share-area">
+      <h3>回答者用共有リンク</h3>
+      <p class="share-hint">
+        ① 武将・戦法カードをタップして「所持中」にする<br>
+        ② 下のボタンを押して、リンクをコピー<br>
+        ③ LINEなどで回答者に送ってください
+      </p>
+      <div class="export-controls">
+        <button id="share-link-button">共有リンクをコピー</button>
+      </div>
+      <input
+        type="text"
+        id="share-link"
+        readonly
+        placeholder="ここに共有リンクが表示されます">
+    </section>
+    <!-- ★ 共有リンクエリアここまで ★ -->
+
+    <div id="busho-list" class="busho-list"></div>
+  </section>
+
+
+  <!-- 戦法タブ -->
+  <section id="tactics-tab" class="tab-content">
+    <h2>所持戦法</h2>
+
+    <section class="tactics-search-area">
+      <div class="search-row">
+        <label>
+          戦法名 / 所有者で検索：
+          <input type="text" id="tactics-search-input" placeholder="例） 槍の鈴, 真田 など">
+        </label>
+      </div>
+
+      <div class="filter-row">
+        <label>
+          種類：
+          <select id="tactics-filter-type">
+            <option value="">すべて</option>
+            <!-- JSで種類を自動追加 -->
+          </select>
+        </label>
+
+        <label class="filter-owned">
+          <input type="checkbox" id="tactics-filter-owned">
+          所持している戦法のみ表示
+        </label>
+      </div>
+    </section>
+
+    <div id="tactics-list" class="busho-list"></div>
+  </section>
+
+
+
+  <script src="main.js"></script>
+</body>
+</html>
