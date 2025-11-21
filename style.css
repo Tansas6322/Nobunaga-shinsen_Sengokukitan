@@ -3,6 +3,7 @@ body {
   margin: 0;
   padding: 0;
   background: #f5f5f5;
+  padding-bottom: 220px;  /* ★ これを追加：下に固定パネルのぶん空ける */
 }
 
 header {
@@ -128,37 +129,24 @@ header p {
   color: #0b63c5;
 }
 
-.export-area {
+.comment-area {
   padding: 12px 16px;
   background: #fff;
   border-bottom: 1px solid #ddd;
 }
 
-.export-area h2 {
+.comment-area h2 {
   margin: 0 0 8px;
   font-size: 16px;
 }
 
-.export-controls {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+.comment-hint {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: #555;
 }
 
-.export-controls button {
-  padding: 4px 10px;
-  font-size: 13px;
-  border-radius: 4px;
-  border: 1px solid #888;
-  background: #f4f4f4;
-  cursor: pointer;
-}
-
-.export-controls button:hover {
-  background: #e8e8e8;
-}
-
-#owned-text {
+#comment-text {
   width: 100%;
   box-sizing: border-box;
   font-size: 12px;
@@ -302,11 +290,11 @@ header p {
     font-size: 14px;
   }
 
-  .export-area {
+  .comment-area {
     padding: 10px 12px;
   }
 
-  #owned-text {
+  #comment-text {
     font-size: 11px;
   }
 
@@ -349,4 +337,200 @@ header p {
   box-sizing: border-box;
   font-size: 12px;
   padding: 4px 8px;
+}
+
+.busho-card-main,
+.tactic-card-main {
+  display: flex;
+  gap: 8px;
+}
+
+.busho-image-wrap,
+.tactic-image-wrap {
+  flex: 0 0 60px;
+}
+
+.busho-image,
+.tactic-image {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* ==== 戦法カード 画像レイアウト ==== */
+.tactic-card-main {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.tactic-image-wrap {
+  flex: 0 0 72px;   /* 画像の固定幅 */
+}
+
+.tactic-image {
+  width: 72px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.tactic-info {
+  flex: 1;
+  min-width: 0;     /* 狭いときに折り返してくれる */
+}
+
+/* ==== 勢力ごとの武将カード色 ==== */
+.busho-card {
+  position: relative;  /* inset box-shadow を使うため */
+}
+
+/* 織田：赤 */
+.busho-card.faction-oda {
+  box-shadow: inset 4px 0 0 #ff4d4d;
+}
+
+/* 豊臣：オレンジ */
+.busho-card.faction-toyotomi {
+  box-shadow: inset 4px 0 0 #f39c12;
+}
+
+/* 徳川：緑 */
+.busho-card.faction-tokugawa {
+  box-shadow: inset 4px 0 0 #27ae60;
+}
+
+/* 武田：深い赤 */
+.busho-card.faction-takeda {
+  box-shadow: inset 4px 0 0 #8b0000;
+}
+
+/* 上杉：青 */
+.busho-card.faction-uesugi {
+  box-shadow: inset 4px 0 0 #2980b9;
+}
+
+/* 群：紫 */
+.busho-card.faction-gun {
+  box-shadow: inset 4px 0 0 #8e44ad;
+}
+
+/* ==== 回答者用 編成作成エリア ==== */
+.build-answer-area {
+  padding: 8px 12px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
+  position: fixed;     /* ★ 画面下に固定 */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  max-height: 50vh;    /* ★ 高さ上限（中だけスクロール） */
+  overflow-y: auto;
+}
+
+/* ヘッダー行（タイトル＋トグルボタン） */
+.builder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.build-answer-area h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.builder-toggle {
+  border: none;
+  background: #eee;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.builder-toggle:hover {
+  background: #ddd;
+}
+
+.builder-hint {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #555;
+}
+
+.builder-team {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.team-slot {
+  flex: 1;
+  min-width: 220px;
+  background: #fafafa;
+  border-radius: 6px;
+  padding: 8px 10px;
+  border: 1px dashed #ccc;
+}
+
+.team-slot h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.builder-drop {
+  background: #fff;
+  border-radius: 4px;
+  padding: 4px 6px;
+  margin-top: 4px;
+  font-size: 13px;
+  border: 1px dashed #bbb;
+  min-height: 24px;
+}
+
+/* ドラッグ中の見た目 */
+.builder-drop.drag-over {
+  border-color: #0078ff;
+  background: #e7f6ff;
+}
+
+.builder-export {
+  margin-top: 8px;
+}
+
+#builder-copy {
+  margin-bottom: 4px;
+}
+
+#builder-text {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 12px;
+  padding: 4px 6px;
+}
+
+/* ★ 折りたたみ時：中身を隠す */
+.build-answer-area.collapsed .builder-hint,
+.build-answer-area.collapsed .builder-team,
+.build-answer-area.collapsed .builder-export {
+  display: none;
+}
+
+.build-answer-area.collapsed {
+  max-height: none;   /* 高さ制限解除（ヘッダーだけ） */
+}
+
+/* スマホ向け調整 */
+@media (max-width: 768px) {
+  .builder-team {
+    flex-direction: column;
+  }
 }

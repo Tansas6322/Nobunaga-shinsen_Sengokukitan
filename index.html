@@ -12,59 +12,136 @@
 <body>
   <header>
     <h1>信長の野望 真戦 編成サポート</h1>
-    <p>Step1: 武将一覧 + 検索</p>
+    <p>武将一覧 + 検索</p>
   </header>
+  
+    <!-- ★ 回答者用：編成作成エリア ★ -->
+<section class="build-answer-area">
+  <div class="builder-header">
+    <h2>回答者用：編成作成</h2>
+    <button type="button" id="builder-toggle" class="builder-toggle" title="折りたたみ/展開">
+      ▼
+    </button>
+  </div>
+        <p class="builder-hint">
+        左の武将・戦法カードをドラッグして、枠にドロップしてください。
+      </p>
+
+      <div class="builder-team">
+        <!-- 主将 -->
+        <div class="team-slot">
+          <h3>主将</h3>
+          <div class="builder-drop slot-busho"
+               data-role="main"
+               data-accept="busho">
+            ここに武将をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="main"
+               data-accept="tactic"
+               data-skill-index="0">
+            固有：ここに戦法をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="main"
+               data-accept="tactic"
+               data-skill-index="1">
+            伝承1：ここに戦法をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="main"
+               data-accept="tactic"
+               data-skill-index="2">
+            伝承2：ここに戦法をドロップ
+          </div>
+        </div>
+
+        <!-- 副将1 -->
+        <div class="team-slot">
+          <h3>副将1</h3>
+          <div class="builder-drop slot-busho"
+               data-role="sub1"
+               data-accept="busho">
+            ここに武将をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="sub1"
+               data-accept="tactic"
+               data-skill-index="0">
+            固有：ここに戦法をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="sub1"
+               data-accept="tactic"
+               data-skill-index="1">
+            伝承1：ここに戦法をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="sub1"
+               data-accept="tactic"
+               data-skill-index="2">
+            伝承2：ここに戦法をドロップ
+          </div>
+        </div>
+
+        <!-- 副将2 -->
+        <div class="team-slot">
+          <h3>副将2</h3>
+          <div class="builder-drop slot-busho"
+               data-role="sub2"
+               data-accept="busho">
+            ここに武将をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="sub2"
+               data-accept="tactic"
+               data-skill-index="0">
+            固有：ここに戦法をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="sub2"
+               data-accept="tactic"
+               data-skill-index="1">
+            伝承1：ここに戦法をドロップ
+          </div>
+          <div class="builder-drop slot-skill"
+               data-role="sub2"
+               data-accept="tactic"
+               data-skill-index="2">
+            伝承2：ここに戦法をドロップ
+          </div>
+        </div>
+      </div>
+
+      <div class="builder-export">
+        <button id="builder-copy">編成案を出力</button>
+        <textarea id="builder-text" rows="6"
+                  placeholder="ここに編成案が自動生成されます"></textarea>
+      </div>
+    </section>
+    <!-- ★ 回答者用エリアここまで ★ -->
 
   <!-- ★ ここにタブナビを移動 ★ -->
   <nav class="tabs">
     <button class="tab-button active" data-tab="busho-tab">武将</button>
     <button class="tab-button" data-tab="tactics-tab">戦法</button>
   </nav>
- <section class="search-area">
-  <div class="search-row">
-    <label>
-      武将名 / 勢力で検索：
-      <input type="text" id="search-input" placeholder="例） 信長, 織田 など">
-    </label>
-  </div>
-
-  <div class="filter-row">
-    <label>
-      星：
-      <select id="filter-star">
-        <option value="">すべて</option>
-        <!-- JS でユニークな星を追加します -->
-      </select>
-    </label>
-
-    <label>
-      勢力：
-      <select id="filter-faction">
-        <option value="">すべて</option>
-        <!-- JS でユニークな勢力を追加します -->
-      </select>
-    </label>
-
-    <label class="filter-owned">
-      <input type="checkbox" id="filter-owned">
-      所持している武将のみ表示
-    </label>
-  </div>
-</section>
 
 
 <main>
 
   <!-- 武将タブ -->
   <section id="busho-tab" class="tab-content active">
-    <!-- ここに武将のUI（今あるもの全部）を丸ごと入れる -->
-    <section class="export-area">
-      <h2>編成相談用：所持武将リスト</h2>
-      <div class="export-controls">
-        <button id="generate-owned-text">所持武将リストを生成</button>
-        <button id="copy-owned-text">コピー</button>
-      </div>
-      <textarea id="owned-text" rows="8" readonly></textarea>
+    <!-- コメント入力エリア -->
+    <section class="comment-area">
+      <h2>編成相談用コメント</h2>
+      <p class="comment-hint">
+        例）「信長を主将にして鉄砲中心で組みたいです」「今期は○○編成に勝ちたいです」など
+      </p>
+      <textarea
+        id="comment-text"
+        rows="4"
+        placeholder="相談内容や希望があれば自由に書いてください"></textarea>
     </section>
 
     <!-- ★ ここから共有リンクエリア ★ -->
@@ -73,7 +150,7 @@
       <p class="share-hint">
         ① 武将・戦法カードをタップして「所持中」にする<br>
         ② 下のボタンを押して、リンクをコピー<br>
-        ③ LINEなどで回答者に送ってください
+        ③ Discordに送ってください
       </p>
       <div class="export-controls">
         <button id="share-link-button">共有リンクをコピー</button>
@@ -86,6 +163,40 @@
     </section>
     <!-- ★ 共有リンクエリアここまで ★ -->
 
+
+
+  <!-- 武将検索エリア（タブ専用） -->
+<section class="search-area">
+  <div class="search-row">
+    <label>
+      武将名 / 勢力で検索：
+      <input type="text" id="search-input" placeholder="例） 信長, 織田 など">
+    </label>
+  </div>
+
+  <div class="filter-row">
+    <label>
+      星：
+      <select id="filter-star">
+        <option value="">すべて</option>
+      </select>
+    </label>
+
+    <label>
+      勢力：
+      <select id="filter-faction">
+        <option value="">すべて</option>
+      </select>
+    </label>
+
+    <label class="filter-owned">
+      <input type="checkbox" id="filter-owned">
+      所持している武将のみ表示
+    </label>
+  </div>
+</section>
+
+
     <div id="busho-list" class="busho-list"></div>
   </section>
 
@@ -95,27 +206,31 @@
     <h2>所持戦法</h2>
 
     <section class="tactics-search-area">
-      <div class="search-row">
-        <label>
-          戦法名 / 所有者で検索：
-          <input type="text" id="tactics-search-input" placeholder="例） 槍の鈴, 真田 など">
-        </label>
-      </div>
+<div class="filter-row">
+  <label>
+    種類：
+    <select id="tactics-filter-type">
+      <option value="">すべて</option>
+      <!-- JSで種類を自動追加 -->
+    </select>
+  </label>
 
-      <div class="filter-row">
-        <label>
-          種類：
-          <select id="tactics-filter-type">
-            <option value="">すべて</option>
-            <!-- JSで種類を自動追加 -->
-          </select>
-        </label>
+  <!-- ★ここから追加★ -->
+  <label>
+    区分：
+    <select id="tactics-filter-kind">
+      <option value="">すべて</option>
+      <option value="owner">固有戦法</option>
+      <option value="inherit">伝承戦法</option>
+    </select>
+  </label>
+  <!-- ★ここまで追加★ -->
 
-        <label class="filter-owned">
-          <input type="checkbox" id="tactics-filter-owned">
-          所持している戦法のみ表示
-        </label>
-      </div>
+  <label class="filter-owned">
+    <input type="checkbox" id="tactics-filter-owned">
+    所持している戦法のみ表示
+  </label>
+</div>
     </section>
 
     <div id="tactics-list" class="busho-list"></div>

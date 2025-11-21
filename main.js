@@ -11,6 +11,25 @@ const OWN_TACTICS_KEY = "nobunagashinsen_owned_tactics";
 
 const OWN_KEY = 'nobunagashinsen_owned_busho';
 
+// 勢力ごとのカード色クラス
+const FACTION_CLASS_MAP = {
+  '織田': 'faction-oda',
+  '豊臣': 'faction-toyotomi',
+  '徳川': 'faction-tokugawa',
+  '武田': 'faction-takeda',
+  '上杉': 'faction-uesugi',
+  '群': 'faction-gun',
+  // 必要に応じてあとから足せる
+};
+
+// 回答者用：編成状態
+const formation = {
+  main: { busho: '', skills: ['', '', ''] },
+  sub1: { busho: '', skills: ['', '', ''] },
+  sub2: { busho: '', skills: ['', '', ''] }
+};
+
+
 // ---------- 所持情報の読み書き ----------
 
 function loadOwned() {
@@ -158,6 +177,7 @@ function renderBushoList(list) {
 
     const name = b['武将名'] || '不明';
     const seiryoku = b['勢力'] || '-';
+    const kamon = b['家門'] || '-';
     const hoshi = b['星'] ?? '-';
     const cost = b['コスト'] ?? '-';
 
@@ -168,23 +188,41 @@ function renderBushoList(list) {
     const miryoku = b['魅力'] ?? '-';
 
     const owned = !!ownedMap[name];
+    
+// 画像フィールドが無い場合はプレースホルダー
+const imgSrc = b["画像"]
+  ? `images/busho/${b["画像"]}`
+  : 'images/placeholder.png';
+  
+  // ★ 勢力に応じたクラス名
+const factionClass = FACTION_CLASS_MAP[seiryoku] || '';
 
-    card.className = 'busho-card' + (owned ? ' owned' : '');
+card.className = 'busho-card ' + factionClass + (owned ? ' owned' : '');
     card.dataset.name = name; // カードに武将名を紐づけ
 
-    card.innerHTML = `
+card.innerHTML = `
+  <div class="busho-card-main">
+    <div class="busho-image-wrap">
+      <img src="${imgSrc}" alt="${name}" class="busho-image">
+    </div>
+    <div class="busho-info">
       <div class="busho-name">${name}</div>
-      <div class="busho-meta">
-        勢力：${seiryoku} / 星：${hoshi} / コスト：${cost}
-      </div>
+<div class="busho-meta">
+  勢力：${seiryoku} / 家門：${kamon} / 星：${hoshi} / コスト：${cost}
+</div>
       <div class="busho-stats">
-        武勇：${buyu}　知略：${chiryaku}　統率：${tosu}<br>
-        速度：${sokudo}　魅力：${miryoku}
+        武勇：${buyu}　知略：${chiryaku}　統率：${tosu}　速度：${sokudo}　魅力：${miryoku}
       </div>
       <div class="busho-own-status">
         ${owned ? '所持中' : '未所持'}
       </div>
-    `;
+    </div>
+  </div>
+`;
+card.draggable = true;
+card.dataset.type = 'busho';
+
+
 
     container.appendChild(card);
   });
@@ -211,6 +249,11 @@ function renderTacticsList(list) {
       t['大将技'] != null && t['大将技'].toString().trim() !== '';
 
     const owned = !!ownedTactics[name];
+    
+    const imgSrc = t["画像"]
+  ? `images/tactics/${t["画像"]}`
+  : 'images/placeholder.png';
+
 
     // 種類ごとにクラスを付けて色分け
     let typeClass = '';
@@ -248,11 +291,16 @@ function renderTacticsList(list) {
       inheritText = `伝承者：${arr.join(' / ')}`;
     }
 
-    // 戦法内容は長いので少しだけ表示
-    const shortEffect =
-      effect.length > 60 ? effect.slice(0, 60) + '…' : effect;
+// 戦法内容は長いので少しだけ表示（50文字に拡張）
+const shortEffect =
+  effect.length > 50 ? effect.slice(0, 50) + '…' : effect;
 
-    card.innerHTML = `
+card.innerHTML = `
+  <div class="tactic-card-main">
+    <div class="tactic-image-wrap">
+      <img src="${imgSrc}" alt="${name}" class="tactic-image">
+    </div>
+    <div class="tactic-info">
       <div class="busho-name">${name}</div>
       <div class="busho-meta">
         種類：${type} ／ 発動確率：${chance}
@@ -267,7 +315,26 @@ function renderTacticsList(list) {
       <div class="busho-own-status">
         ${owned ? '所持中' : '未所持'}
       </div>
-    `;
+    </div>
+  </div>
+`;
+card.draggable = true;
+card.dataset.type = 'tactic';
+
+
+// ★ 追加：ホバーで全文が読めるように title を付与
+// ツールチップ用の全文テキストを作る
+let tooltip = effect || '';
+
+const taishogi = (t['大将技'] || '').toString().trim();
+if (taishogi) {
+  // 戦法内容の下に大将技を追記
+  tooltip += '\n\n【大将技】\n' + taishogi;
+}
+
+// ホバー時に「戦法内容＋大将技」が表示される
+card.title = tooltip;
+
 
     container.appendChild(card);
   });
@@ -333,11 +400,13 @@ function applyFiltersAndRender() {
 function applyTacticsFiltersAndRender() {
   const searchInput = document.getElementById('tactics-search-input');
   const typeSelect = document.getElementById('tactics-filter-type');
+  const kindSelect = document.getElementById('tactics-filter-kind');  // ★追加
   const ownedCheckbox = document.getElementById('tactics-filter-owned');
 
   const keyword = (searchInput?.value || '').trim();
   const lower = keyword.toLowerCase();
   const typeValue = typeSelect?.value || '';
+  const kindValue = kindSelect?.value || '';          // ★追加
   const ownedOnly = ownedCheckbox?.checked || false;
 
   const filtered = allTactics.filter(t => {
@@ -359,6 +428,17 @@ function applyTacticsFiltersAndRender() {
 
     // 種類フィルタ
     if (typeValue && type !== typeValue) {
+      return false;
+    }
+
+    // ★区分フィルタ（固有戦法／伝承戦法）
+    const hasOwner = !!owner;           // 所有者あり
+    const hasInheritor = !!(d1 || d2);  // 伝承者1か2がいる
+
+    if (kindValue === 'owner' && !hasOwner) {
+      return false;
+    }
+    if (kindValue === 'inherit' && !hasInheritor) {
       return false;
     }
 
@@ -405,6 +485,7 @@ function setupFilters() {
 function setupTacticsSearchAndFilters() {
   const searchInput = document.getElementById('tactics-search-input');
   const typeSelect = document.getElementById('tactics-filter-type');
+  const kindSelect = document.getElementById('tactics-filter-kind');   // ★追加
   const ownedCheckbox = document.getElementById('tactics-filter-owned');
 
   if (searchInput) {
@@ -412,6 +493,9 @@ function setupTacticsSearchAndFilters() {
   }
   if (typeSelect) {
     typeSelect.addEventListener('change', applyTacticsFiltersAndRender);
+  }
+  if (kindSelect) {                                                    // ★追加
+    kindSelect.addEventListener('change', applyTacticsFiltersAndRender);
   }
   if (ownedCheckbox) {
     ownedCheckbox.addEventListener('change', applyTacticsFiltersAndRender);
@@ -567,7 +651,12 @@ function getCurrentSelectionState() {
     .filter(([, v]) => v)
     .map(([name]) => name);
 
-  return { b: bushoOwned, t: tacticsOwned };
+  // コメント
+  const commentInput = document.getElementById('comment-text');
+  const comment = commentInput ? commentInput.value : '';
+
+  // b: 武将, t: 戦法, c: コメント
+  return { b: bushoOwned, t: tacticsOwned, c: comment };
 }
 
 // 日本語を含む文字列を Base64 にエンコード
@@ -685,6 +774,13 @@ function applySharedStateFromUrl() {
     (state.t || []).forEach(name => {
       ownedTactics[name] = true;
     });
+    
+    // コメント（あれば）
+    const commentInput = document.getElementById('comment-text');
+    if (commentInput && typeof state.c === 'string') {
+      commentInput.value = state.c;
+    }
+
 
     // ローカルにも保存しておく（回答者側のlocalStorageにも入る）
     saveOwned();
@@ -692,6 +788,130 @@ function applySharedStateFromUrl() {
   } catch (e) {
     console.error('共有リンクの解析に失敗しました', e);
   }
+}
+
+function setupDragAndDrop() {
+  // カード側：ドラッグ開始
+  document.addEventListener('dragstart', (e) => {
+    const card = e.target.closest('.busho-card');
+    if (!card) return;
+
+    const type = card.dataset.type || (card.classList.contains('tactic-card') ? 'tactic' : 'busho');
+    const name = card.dataset.name;
+    if (!name) return;
+
+    e.dataTransfer.setData('text/plain', JSON.stringify({ type, name }));
+  });
+
+  // スロット側：ドラッグ受け取り
+  document.querySelectorAll('.builder-drop').forEach(slot => {
+    slot.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      slot.classList.add('drag-over');
+    });
+
+    slot.addEventListener('dragleave', () => {
+      slot.classList.remove('drag-over');
+    });
+
+    slot.addEventListener('drop', (e) => {
+      e.preventDefault();
+      slot.classList.remove('drag-over');
+
+      const dataStr = e.dataTransfer.getData('text/plain');
+      if (!dataStr) return;
+
+      let data;
+      try {
+        data = JSON.parse(dataStr);
+      } catch {
+        return;
+      }
+
+      const accept = slot.dataset.accept; // "busho" or "tactic"
+      if (data.type !== accept) {
+        return; // 種類が違うものは無視
+      }
+
+      const role = slot.dataset.role; // "main" | "sub1" | "sub2"
+      const skillIndex = slot.dataset.skillIndex; // 0,1,2 or undefined
+
+      const name = data.name;
+      slot.textContent = name;
+
+      if (!formation[role]) return;
+
+      if (accept === 'busho') {
+        // 武将をスロットにセット
+        formation[role].busho = name;
+
+        // ★ ここから：固有戦法を自動で固有スロットに入れる
+        const busho = allBusho.find(b => b['武将名'] === name);
+        if (busho && busho['固有戦法']) {
+          const uniqueName = busho['固有戦法'];
+
+          // 編成データに反映（skills[0]を「固有」として使う）
+          formation[role].skills[0] = uniqueName;
+
+          // 画面上の「固有：～」スロットの表示も更新
+          const uniqueSlot = document.querySelector(
+            `.builder-drop.slot-skill[data-role="${role}"][data-skill-index="0"]`
+          );
+          if (uniqueSlot) {
+            uniqueSlot.textContent = uniqueName;
+          }
+        }
+        // ★ ここまで追加
+      } else {
+        // 戦法（固有/伝承）をドロップしたとき
+        const idx = Number(skillIndex);
+        formation[role].skills[idx] = name || '';
+      }
+    });
+  });
+}
+
+function setupBuilderExport() {
+  const btn = document.getElementById('builder-copy');
+  const area = document.getElementById('builder-text');
+  if (!btn || !area) return;
+
+  btn.addEventListener('click', () => {
+    const lines = [];
+    lines.push('【編成案】', '');
+
+    const pushRole = (label, key) => {
+      const r = formation[key];
+      lines.push(`${label}：${r.busho || '-'}`);
+      lines.push(` 固有：${r.skills[0] || '-'}`);
+      lines.push(` 伝承：${r.skills[1] || '-'}`);
+      lines.push(` 伝承：${r.skills[2] || '-'}`);
+      lines.push('');
+    };
+
+    pushRole('主将', 'main');
+    pushRole('副将1', 'sub1');
+    pushRole('副将2', 'sub2');
+
+    const text = lines.join('\n');
+    area.value = text;
+    area.select();
+    document.execCommand('copy');
+
+    alert('編成案をコピーしました');
+  });
+}
+
+function setupBuilderToggle() {
+  const area = document.querySelector('.build-answer-area');
+  const btn = document.getElementById('builder-toggle');
+  if (!area || !btn) return;
+
+  btn.addEventListener('click', () => {
+    const collapsed = area.classList.toggle('collapsed');
+    // ボタンの表示切り替え（お好みで）
+    btn.textContent = collapsed ? '▲' : '▼';
+  });
 }
 
 
@@ -717,4 +937,8 @@ window.addEventListener('DOMContentLoaded', () => {
   setupTacticsClick();
   setupTacticsSearchAndFilters();
   loadTactics();
+    setupDragAndDrop();
+  setupBuilderExport();
+    // ★ 折りたたみボタン
+  setupBuilderToggle();
 });
