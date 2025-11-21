@@ -505,6 +505,62 @@ function setupTacticsSearchAndFilters() {
   }
 }
 
+// 武将カードクリック：相談モード＝所持切り替え ／ 回答モード＝編成入力
+function setupCardClickHandler() {
+  const container = document.getElementById('busho-list');
+  if (!container) return;
+
+  container.addEventListener('click', (e) => {
+    const card = e.target.closest('.busho-card');
+    if (!card) return;
+
+    const name = card.dataset.name;
+    if (!name) return;
+
+    const isMobile = window.matchMedia('(pointer: coarse)').matches;
+
+    // ==== 回答モード ====
+    if (currentMode === "answer") {
+
+      // ---- スマホ：タップで武将枠選択モード ----
+      if (isMobile) {
+        e.preventDefault();
+
+        // どの武将をセットするか保存
+        tapSelectMode = { type: 'busho', name };
+
+        // 受け入れ可能な武将スロットをハイライト
+        document
+          .querySelectorAll('.builder-drop[data-accept="busho"]')
+          .forEach(s => s.classList.add('tap-target'));
+
+        alert('入れたい武将枠をタップしてください');
+      }
+
+      // ---- PC：ドラッグ＆ドロップに任せる ----
+      return;
+    }
+
+    // ==== 相談モード（所持ON/OFF） ====
+    const newValue = !ownedMap[name];
+    ownedMap[name] = newValue;
+    saveOwned();
+
+    card.classList.toggle('owned', newValue);
+
+    const status = card.querySelector('.busho-own-status');
+    if (status) {
+      status.textContent = newValue ? '所持中' : '未所持';
+    }
+
+    // 「所持している武将のみ表示」が ON のときは再フィルタ
+    const ownedCheckbox = document.getElementById('filter-owned');
+    if (ownedCheckbox && ownedCheckbox.checked) {
+      applyFiltersAndRender();
+    }
+  });
+}
+
 
 // 戦法カードクリック：相談モード＝所持切り替え ／ 回答モード＝編成入力
 function setupTacticsClick() {
