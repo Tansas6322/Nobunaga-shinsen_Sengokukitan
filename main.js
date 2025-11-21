@@ -504,9 +504,11 @@ function setupTacticsSearchAndFilters() {
 }
 
 
-// カードクリックで所持切り替え
+// カードクリックで所持切り替え ＆ モバイルではタップ選択モード
 function setupCardClickHandler() {
   const container = document.getElementById('busho-list');
+  if (!container) return;
+
   container.addEventListener('click', (e) => {
     const card = e.target.closest('.busho-card');
     if (!card) return;
@@ -514,83 +516,81 @@ function setupCardClickHandler() {
     const name = card.dataset.name;
     if (!name) return;
 
+    const isMobile = window.matchMedia('(pointer: coarse)').matches;
+
+    // ===== スマホ：タップで編成スロット選択モード =====
+    if (isMobile) {
+      e.preventDefault();
+
+      tapSelectMode = { type: 'busho', name };
+
+      document
+        .querySelectorAll(".builder-drop[data-accept='busho']")
+        .forEach(s => s.classList.add('tap-target'));
+
+      alert('入れたいスロットをタップしてください');
+      return;
+    }
+
+    // ===== PC：所持フラグの ON/OFF =====
     const newValue = !ownedMap[name];
     ownedMap[name] = newValue;
     saveOwned();
 
-    // 見た目を更新
     card.classList.toggle('owned', newValue);
-    const statusEl = card.querySelector('.busho-own-status');
-    if (statusEl) {
-      statusEl.textContent = newValue ? '所持中' : '未所持';
-    } else {
-      // クラス名ミス防止で念のため
-      const statusEl2 = card.querySelector('.busho-own-status');
-      if (statusEl2) {
-        statusEl2.textContent = newValue ? '所持中' : '未所持';
-      }
+
+    const status = card.querySelector('.busho-own-status');
+    if (status) {
+      status.textContent = newValue ? '所持中' : '未所持';
     }
 
-    // 「所持している武将のみ表示」が ON のときは再フィルタ
+    // 「所持している武将のみ表示」が ON なら再フィルタ
     const ownedCheckbox = document.getElementById('filter-owned');
     if (ownedCheckbox && ownedCheckbox.checked) {
       applyFiltersAndRender();
     }
   });
-  // ★ モバイル判定
-const isMobile = window.matchMedia("(pointer: coarse)").matches;
-
-// 武将カードクリック時
-if (isMobile) {
-  card.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    tapSelectMode = { type: "busho", name: name };
-
-    // スロットを光らせる
-    document.querySelectorAll(".builder-drop[data-accept='busho']")
-      .forEach(s => s.classList.add("tap-target"));
-
-    alert("入れたいスロットをタップしてください");
-  });
-  return; // 所持切替は無効
 }
 
-}
-
+// 戦法カードクリック：PCは所持切り替え、スマホはタップ選択モード
 function setupTacticsClick() {
   const container = document.getElementById('tactics-list');
+  if (!container) return;
+
   container.addEventListener('click', (e) => {
     const card = e.target.closest('.busho-card');
     if (!card) return;
 
     const name = card.dataset.name;
+    if (!name) return;
+
+    const isMobile = window.matchMedia('(pointer: coarse)').matches;
+
+    // ===== スマホ：タップで編成スロット選択モード =====
+    if (isMobile) {
+      e.preventDefault();
+
+      tapSelectMode = { type: 'tactic', name };
+
+      document
+        .querySelectorAll(".builder-drop[data-accept='tactic']")
+        .forEach(s => s.classList.add('tap-target'));
+
+      alert('入れたいスキル枠をタップしてください');
+      return;
+    }
+
+    // ===== PC：所持フラグの ON/OFF =====
     const newValue = !ownedTactics[name];
     ownedTactics[name] = newValue;
     saveOwnedTactics();
 
-    // 見た目反映
     card.classList.toggle('owned', newValue);
     const s = card.querySelector('.busho-own-status');
-    if (s) s.textContent = newValue ? '所持中' : '未所持';
+    if (s) {
+      s.textContent = newValue ? '所持中' : '未所持';
+    }
   });
-  // ★ モバイル判定
-const isMobile = window.matchMedia("(pointer: coarse)").matches;
-
-if (isMobile) {
-  card.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    tapSelectMode = { type: "tactic", name: name };
-
-    document.querySelectorAll(".builder-drop[data-accept='tactic']")
-      .forEach(s => s.classList.add("tap-target"));
-
-    alert("入れたいスキル枠をタップしてください");
-  });
-  return;
-}
-
 }
 
 

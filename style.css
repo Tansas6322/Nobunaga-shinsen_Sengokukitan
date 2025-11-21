@@ -552,3 +552,12 @@ header p {
   border-color: #ff9900 !important;
   background: #fff8e1 !important;
 }
+
+@media (max-width: 768px) {
+  html, body {
+    height: auto !important;
+    min-height: auto !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
