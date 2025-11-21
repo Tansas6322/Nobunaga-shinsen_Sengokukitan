@@ -533,6 +533,19 @@ header p {
   .builder-team {
     flex-direction: column;
   }
+
+  /* ★ スマホでは固定をやめて普通のエリアにする ★ */
+  .build-answer-area {
+    position: static;       /* fixed を解除 */
+    box-shadow: none;       /* 上の影も消す（お好みで） */
+    max-height: none;       /* 高さ制限なし */
+    overflow: visible;      /* 中でスクロールしない */
+  }
+
+  /* ★ 下パネル分の余白もいらないのでリセット ★ */
+  body {
+    padding-bottom: 0;
+  }
 }
 
 .tap-target {
