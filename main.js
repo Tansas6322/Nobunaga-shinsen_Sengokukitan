@@ -4,6 +4,8 @@ let allBusho = [];
 // 所持状況マップ { "織田信長": true, ... }
 let ownedMap = {};
 let tapSelectMode = null; 
+let currentMode = "consult"; // consult | answer
+
 
 let allTactics = [];
 let ownedTactics = {};
@@ -504,55 +506,7 @@ function setupTacticsSearchAndFilters() {
 }
 
 
-// カードクリックで所持切り替え ＆ モバイルではタップ選択モード
-function setupCardClickHandler() {
-  const container = document.getElementById('busho-list');
-  if (!container) return;
-
-  container.addEventListener('click', (e) => {
-    const card = e.target.closest('.busho-card');
-    if (!card) return;
-
-    const name = card.dataset.name;
-    if (!name) return;
-
-    const isMobile = window.matchMedia('(pointer: coarse)').matches;
-
-    // ===== スマホ：タップで編成スロット選択モード =====
-    if (isMobile) {
-      e.preventDefault();
-
-      tapSelectMode = { type: 'busho', name };
-
-      document
-        .querySelectorAll(".builder-drop[data-accept='busho']")
-        .forEach(s => s.classList.add('tap-target'));
-
-      alert('入れたいスロットをタップしてください');
-      return;
-    }
-
-    // ===== PC：所持フラグの ON/OFF =====
-    const newValue = !ownedMap[name];
-    ownedMap[name] = newValue;
-    saveOwned();
-
-    card.classList.toggle('owned', newValue);
-
-    const status = card.querySelector('.busho-own-status');
-    if (status) {
-      status.textContent = newValue ? '所持中' : '未所持';
-    }
-
-    // 「所持している武将のみ表示」が ON なら再フィルタ
-    const ownedCheckbox = document.getElementById('filter-owned');
-    if (ownedCheckbox && ownedCheckbox.checked) {
-      applyFiltersAndRender();
-    }
-  });
-}
-
-// 戦法カードクリック：PCは所持切り替え、スマホはタップ選択モード
+// 戦法カードクリック：相談モード＝所持切り替え ／ 回答モード＝編成入力
 function setupTacticsClick() {
   const container = document.getElementById('tactics-list');
   if (!container) return;
@@ -566,32 +520,48 @@ function setupTacticsClick() {
 
     const isMobile = window.matchMedia('(pointer: coarse)').matches;
 
-    // ===== スマホ：タップで編成スロット選択モード =====
-    if (isMobile) {
-      e.preventDefault();
+    // ==== 回答モード ====
+    if (currentMode === "answer") {
 
-      tapSelectMode = { type: 'tactic', name };
+      // ---- スマホ：タップでスキル枠選択モード ----
+      if (isMobile) {
+        e.preventDefault();
 
-      document
-        .querySelectorAll(".builder-drop[data-accept='tactic']")
-        .forEach(s => s.classList.add('tap-target'));
+        // どの戦法をセットするか保存
+        tapSelectMode = { type: 'tactic', name };
 
-      alert('入れたいスキル枠をタップしてください');
+        // 受け入れ可能なスキル枠をハイライト
+        document
+          .querySelectorAll('.builder-drop[data-accept="tactic"]')
+          .forEach(s => s.classList.add('tap-target'));
+
+        alert('入れたい戦法枠をタップしてください');
+      }
+
+      // ---- PC：ドラッグ＆ドロップに任せる ----
       return;
     }
 
-    // ===== PC：所持フラグの ON/OFF =====
+    // ==== 相談モード（所持ON/OFF） ====
     const newValue = !ownedTactics[name];
     ownedTactics[name] = newValue;
     saveOwnedTactics();
 
     card.classList.toggle('owned', newValue);
-    const s = card.querySelector('.busho-own-status');
-    if (s) {
-      s.textContent = newValue ? '所持中' : '未所持';
+
+    const status = card.querySelector('.busho-own-status');
+    if (status) {
+      status.textContent = newValue ? '所持中' : '未所持';
+    }
+
+    // 「所持している戦法のみ表示」が ON のときは再フィルタ
+    const ownedCheckbox = document.getElementById('tactics-filter-owned');
+    if (ownedCheckbox && ownedCheckbox.checked) {
+      applyTacticsFiltersAndRender();
     }
   });
 }
+
 
 
 // ---------- 所持武将リストのテキスト生成 ----------
@@ -1006,6 +976,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // もし共有リンク(#s=...)で開かれていたら、そちらの状態で上書き
   applySharedStateFromUrl();
+  
+  document.querySelectorAll('input[name="mode"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    currentMode = e.target.value;
+  });
+});
+
 
   // 画面のイベント設定など
   setupSearch();

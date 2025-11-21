@@ -561,3 +561,13 @@ header p {
     margin-bottom: 0 !important;
   }
 }
+
+.mode-switch {
+  padding: 6px 8px;
+  font-size: 14px;
+  display: flex;
+  gap: 16px;
+}
+.mode-switch input {
+  margin-right: 4px;
+}
