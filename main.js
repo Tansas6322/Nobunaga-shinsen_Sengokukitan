@@ -3,6 +3,7 @@ let allBusho = [];
 
 // 所持状況マップ { "織田信長": true, ... }
 let ownedMap = {};
+let tapSelectMode = null; 
 
 let allTactics = [];
 let ownedTactics = {};
@@ -536,6 +537,25 @@ function setupCardClickHandler() {
       applyFiltersAndRender();
     }
   });
+  // ★ モバイル判定
+const isMobile = window.matchMedia("(pointer: coarse)").matches;
+
+// 武将カードクリック時
+if (isMobile) {
+  card.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    tapSelectMode = { type: "busho", name: name };
+
+    // スロットを光らせる
+    document.querySelectorAll(".builder-drop[data-accept='busho']")
+      .forEach(s => s.classList.add("tap-target"));
+
+    alert("入れたいスロットをタップしてください");
+  });
+  return; // 所持切替は無効
+}
+
 }
 
 function setupTacticsClick() {
@@ -554,6 +574,23 @@ function setupTacticsClick() {
     const s = card.querySelector('.busho-own-status');
     if (s) s.textContent = newValue ? '所持中' : '未所持';
   });
+  // ★ モバイル判定
+const isMobile = window.matchMedia("(pointer: coarse)").matches;
+
+if (isMobile) {
+  card.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    tapSelectMode = { type: "tactic", name: name };
+
+    document.querySelectorAll(".builder-drop[data-accept='tactic']")
+      .forEach(s => s.classList.add("tap-target"));
+
+    alert("入れたいスキル枠をタップしてください");
+  });
+  return;
+}
+
 }
 
 
@@ -871,6 +908,51 @@ function setupDragAndDrop() {
   });
 }
 
+function setupTapSelect() {
+  const isMobile = window.matchMedia("(pointer: coarse)").matches;
+  if (!isMobile) return;
+
+  document.querySelectorAll(".builder-drop").forEach(slot => {
+    slot.addEventListener("click", () => {
+      if (!tapSelectMode) return;
+
+      const accept = slot.dataset.accept;
+      const role = slot.dataset.role;
+      const skillIndex = slot.dataset.skillIndex;
+
+      // 種類が合っていない場合は無視
+      if (tapSelectMode.type !== accept) return;
+
+      const name = tapSelectMode.name;
+      slot.textContent = name;
+
+      if (accept === "busho") {
+        formation[role].busho = name;
+
+        // 固有自動セット
+        const busho = allBusho.find(b => b["武将名"] === name);
+        if (busho?.["固有戦法"]) {
+          formation[role].skills[0] = busho["固有戦法"];
+
+          const uniqueSlot = document.querySelector(
+            `.builder-drop.slot-skill[data-role="${role}"][data-skill-index="0"]`
+          );
+          if (uniqueSlot) uniqueSlot.textContent = busho["固有戦法"];
+        }
+      } else {
+        formation[role].skills[skillIndex] = name;
+      }
+
+      // 光らせてたスロットを元に戻す
+      document.querySelectorAll(".tap-target")
+        .forEach(s => s.classList.remove("tap-target"));
+
+      tapSelectMode = null;
+    });
+  });
+}
+
+
 function setupBuilderExport() {
   const btn = document.getElementById('builder-copy');
   const area = document.getElementById('builder-text');
@@ -941,4 +1023,5 @@ window.addEventListener('DOMContentLoaded', () => {
   setupBuilderExport();
     // ★ 折りたたみボタン
   setupBuilderToggle();
+  setupTapSelect();
 });

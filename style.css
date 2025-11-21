@@ -534,3 +534,8 @@ header p {
     flex-direction: column;
   }
 }
+
+.tap-target {
+  border-color: #ff9900 !important;
+  background: #fff8e1 !important;
+}
